@@ -22,7 +22,6 @@ jobs:
       - name: Create complete repository tree
         shell: bash
         run: |
-
           mkdir -p .github/workflows
 
           mkdir -p app/src/main/java/com/hindidubstudio/ui
@@ -51,26 +50,23 @@ jobs:
           touch app/src/main/assets/sfx/.gitkeep
           touch app/src/main/assets/ambience/.gitkeep
 
-          cat > settings.gradle.kts << 'EOF'
-rootProject.name = "HindiDubStudio"
-include(":app")
-EOF
+          printf 'rootProject.name = "HindiDubStudio"\ninclude(":app")\n' > settings.gradle.kts
 
-          cat > build.gradle.kts << 'EOF'
+          cat > build.gradle.kts <<'EOF'
 plugins {
     id("com.android.application") version "8.7.3" apply false
     id("org.jetbrains.kotlin.android") version "2.0.21" apply false
 }
 EOF
 
-          cat > gradle.properties << 'EOF'
+          cat > gradle.properties <<'EOF'
 org.gradle.jvmargs=-Xmx4g -Dfile.encoding=UTF-8
 android.useAndroidX=true
 android.nonTransitiveRClass=true
 kotlin.code.style=official
 EOF
 
-          cat > app/build.gradle.kts << 'EOF'
+          cat > app/build.gradle.kts <<'EOF'
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -106,7 +102,7 @@ dependencies {
 }
 EOF
 
-          cat > app/src/main/AndroidManifest.xml << 'EOF'
+          cat > app/src/main/AndroidManifest.xml <<'EOF'
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application
@@ -118,10 +114,12 @@ EOF
         <activity
             android:name=".MainActivity"
             android:exported="true">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+
         </activity>
 
     </application>
@@ -129,40 +127,41 @@ EOF
 </manifest>
 EOF
 
-          cat > app/src/main/java/com/hindidubstudio/MainActivity.kt << 'EOF'
+          cat > app/src/main/java/com/hindidubstudio/MainActivity.kt <<'EOF'
 package com.hindidubstudio
 
 import android.app.Activity
 import android.os.Bundle
 
 class MainActivity : Activity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
 }
 EOF
 
-          cat > app/src/main/cpp/CMakeLists.txt << 'EOF'
+          cat > app/src/main/cpp/CMakeLists.txt <<'EOF'
 cmake_minimum_required(VERSION 3.22)
 project(HindiDubStudio)
 EOF
 
-          cat > app/src/main/cpp/native_dubbing.cpp << 'EOF'
+          cat > app/src/main/cpp/native_dubbing.cpp <<'EOF'
 // Native dubbing engine placeholder
 EOF
 
-          cat > app/src/main/res/values/strings.xml << 'EOF'
+          cat > app/src/main/res/values/strings.xml <<'EOF'
 <resources>
     <string name="app_name">HindiDubStudio</string>
 </resources>
 EOF
 
-          cat > README.md << 'EOF'
+          cat > README.md <<'EOF'
 # HindiDubStudio
 
 Offline Android English → Hindi dubbing app.
 
-## Planned pipeline
+Planned pipeline:
 
 - MP4/MP3/WAV input
 - Speaker detection
@@ -174,7 +173,7 @@ Offline Android English → Hindi dubbing app.
 - MP3/MP4 export
 EOF
 
-          cat > .gitignore << 'EOF'
+          cat > .gitignore <<'EOF'
 .gradle/
 .idea/
 build/
@@ -186,9 +185,10 @@ EOF
       - name: Commit scaffold
         run: |
           git add .
+
           if git diff --cached --quiet; then
             echo "Nothing to commit."
           else
             git commit -m "Initialize HindiDubStudio repository structure"
-            git push
+            git push origin HEAD:main
           fi
