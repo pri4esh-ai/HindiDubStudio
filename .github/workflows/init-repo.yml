@@ -15,6 +15,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Configure Git
+        shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -23,6 +24,7 @@ jobs:
         shell: bash
         run: |
           mkdir -p .github/workflows
+          mkdir -p app/src/main/java/com/hindidubstudio
           mkdir -p app/src/main/java/com/hindidubstudio/ui
           mkdir -p app/src/main/java/com/hindidubstudio/audio
           mkdir -p app/src/main/java/com/hindidubstudio/dubbing
@@ -46,6 +48,22 @@ jobs:
           touch app/src/main/assets/ambience/.gitkeep
 
           printf '%s\n' \
+            'pluginManagement {' \
+            '    repositories {' \
+            '        google()' \
+            '        mavenCentral()' \
+            '        gradlePluginPortal()' \
+            '    }' \
+            '}' \
+            '' \
+            'dependencyResolutionManagement {' \
+            '    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)' \
+            '    repositories {' \
+            '        google()' \
+            '        mavenCentral()' \
+            '    }' \
+            '}' \
+            '' \
             'rootProject.name = "HindiDubStudio"' \
             'include(":app")' \
             > settings.gradle.kts
@@ -112,12 +130,10 @@ jobs:
             '        <activity' \
             '            android:name=".MainActivity"' \
             '            android:exported="true">' \
-            '' \
             '            <intent-filter>' \
             '                <action android:name="android.intent.action.MAIN"/>' \
             '                <category android:name="android.intent.category.LAUNCHER"/>' \
             '            </intent-filter>' \
-            '' \
             '        </activity>' \
             '' \
             '    </application>' \
@@ -144,7 +160,7 @@ jobs:
             > app/src/main/cpp/CMakeLists.txt
 
           printf '%s\n' \
-            '// Native dubbing engine placeholder' \
+            '// HindiDubStudio native engine' \
             > app/src/main/cpp/native_dubbing.cpp
 
           printf '%s\n' \
@@ -156,18 +172,19 @@ jobs:
           printf '%s\n' \
             '# HindiDubStudio' \
             '' \
-            'Offline Android English to Hindi dubbing app.' \
+            'Offline English to Hindi dubbing Android application.' \
             '' \
             'Planned pipeline:' \
-            '' \
-            '- MP4/MP3/WAV input' \
+            '- MP4 / MP3 / WAV input' \
             '- Speaker detection' \
-            '- Whisper transcription' \
+            '- English transcription' \
             '- English to Hindi translation' \
             '- Editable translation' \
-            '- Kokoro Hindi TTS' \
-            '- OpenVoice voice preservation' \
-            '- MP3/MP4 export' \
+            '- Hindi TTS' \
+            '- Original voice preservation' \
+            '- Per-speaker voice selection' \
+            '- Background audio preservation' \
+            '- MP3 / MP4 export' \
             > README.md
 
           printf '%s\n' \
