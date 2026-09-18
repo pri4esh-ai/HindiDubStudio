@@ -1,0 +1,194 @@
+name: Initialize HindiDubStudio Repository
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  scaffold:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Create complete repository tree
+        shell: bash
+        run: |
+
+          mkdir -p .github/workflows
+
+          mkdir -p app/src/main/java/com/hindidubstudio/ui
+          mkdir -p app/src/main/java/com/hindidubstudio/audio
+          mkdir -p app/src/main/java/com/hindidubstudio/dubbing
+          mkdir -p app/src/main/java/com/hindidubstudio/models
+          mkdir -p app/src/main/java/com/hindidubstudio/export
+          mkdir -p app/src/main/java/com/hindidubstudio/utils
+
+          mkdir -p app/src/main/cpp
+
+          mkdir -p app/src/main/assets/models
+          mkdir -p app/src/main/assets/voices
+          mkdir -p app/src/main/assets/sfx
+          mkdir -p app/src/main/assets/ambience
+
+          mkdir -p app/src/main/res/layout
+          mkdir -p app/src/main/res/drawable
+          mkdir -p app/src/main/res/mipmap-anydpi-v26
+          mkdir -p app/src/main/res/values
+
+          mkdir -p gradle/wrapper
+
+          touch app/src/main/assets/models/.gitkeep
+          touch app/src/main/assets/voices/.gitkeep
+          touch app/src/main/assets/sfx/.gitkeep
+          touch app/src/main/assets/ambience/.gitkeep
+
+          cat > settings.gradle.kts << 'EOF'
+rootProject.name = "HindiDubStudio"
+include(":app")
+EOF
+
+          cat > build.gradle.kts << 'EOF'
+plugins {
+    id("com.android.application") version "8.7.3" apply false
+    id("org.jetbrains.kotlin.android") version "2.0.21" apply false
+}
+EOF
+
+          cat > gradle.properties << 'EOF'
+org.gradle.jvmargs=-Xmx4g -Dfile.encoding=UTF-8
+android.useAndroidX=true
+android.nonTransitiveRClass=true
+kotlin.code.style=official
+EOF
+
+          cat > app/build.gradle.kts << 'EOF'
+plugins {
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
+}
+
+android {
+    namespace = "com.hindidubstudio"
+    compileSdk = 35
+
+    defaultConfig {
+        applicationId = "com.hindidubstudio"
+        minSdk = 26
+        targetSdk = 35
+        versionCode = 1
+        versionName = "0.1.0"
+    }
+
+    buildFeatures {
+        viewBinding = true
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+}
+
+dependencies {
+}
+EOF
+
+          cat > app/src/main/AndroidManifest.xml << 'EOF'
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application
+        android:allowBackup="true"
+        android:label="HindiDubStudio"
+        android:supportsRtl="true"
+        android:theme="@android:style/Theme.Material.Light.NoActionBar">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+
+    </application>
+
+</manifest>
+EOF
+
+          cat > app/src/main/java/com/hindidubstudio/MainActivity.kt << 'EOF'
+package com.hindidubstudio
+
+import android.app.Activity
+import android.os.Bundle
+
+class MainActivity : Activity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+    }
+}
+EOF
+
+          cat > app/src/main/cpp/CMakeLists.txt << 'EOF'
+cmake_minimum_required(VERSION 3.22)
+project(HindiDubStudio)
+EOF
+
+          cat > app/src/main/cpp/native_dubbing.cpp << 'EOF'
+// Native dubbing engine placeholder
+EOF
+
+          cat > app/src/main/res/values/strings.xml << 'EOF'
+<resources>
+    <string name="app_name">HindiDubStudio</string>
+</resources>
+EOF
+
+          cat > README.md << 'EOF'
+# HindiDubStudio
+
+Offline Android English → Hindi dubbing app.
+
+## Planned pipeline
+
+- MP4/MP3/WAV input
+- Speaker detection
+- Whisper transcription
+- English → Hindi translation
+- Editable translation
+- Kokoro Hindi TTS
+- OpenVoice voice preservation
+- MP3/MP4 export
+EOF
+
+          cat > .gitignore << 'EOF'
+.gradle/
+.idea/
+build/
+app/build/
+local.properties
+*.iml
+EOF
+
+      - name: Commit scaffold
+        run: |
+          git add .
+          if git diff --cached --quiet; then
+            echo "Nothing to commit."
+          else
+            git commit -m "Initialize HindiDubStudio repository structure"
+            git push
+          fi
